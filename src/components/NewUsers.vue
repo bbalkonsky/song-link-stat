@@ -70,7 +70,7 @@
                     ],
                     series : [
                         {
-                            name:'uniq',
+                            name:'new users',
                             type:'bar',
                             barWidth: '60%',
                             data: uniqUsersByDate.map(item => item.count)
