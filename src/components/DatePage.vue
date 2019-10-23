@@ -1,28 +1,33 @@
 <template>
     <div class="date-page">
-        <b-button
-                tag="router-link"
-                to="/"
-                type="is-link">
-            Go back
-        </b-button>
+        <div class="columns is-multiline">
+            <div class="column is-full">
+                <b-button
+                        tag="router-link"
+                        to="/"
+                        type="is-link">
+                    Go back
+                </b-button>
 
-        <h1>{{today}}</h1>
+                <h1>{{today}}</h1>
+            </div>
 
-        <template v-if="dayLog.length">
-            <b-table :data="dayLog" :columns="columns"></b-table>
-
-            <day-types
-                    :log-slice="dayLog">
-            </day-types>
-
-            <day-services
-                    :log-slice="dayLog">
-            </day-services>
-        </template>
+            <template v-if="dayLog.length">
+                <div class="column is-full">
+                    <b-table :data="dayLog" :columns="columns"></b-table>
+                </div>
+                <div class="column is-half">
+                    <day-types :log-slice="dayLog"></day-types>
+                </div>
+                <div class="column is-half">
+                    <day-services :log-slice="dayLog"></day-services>
+                </div>
+            </template>
+        </div>
 
         <b-loading :active="!dayLog.length"></b-loading>
     </div>
+
 </template>
 
 <script>

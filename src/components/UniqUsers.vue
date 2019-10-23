@@ -1,5 +1,5 @@
 <template>
-    <div class="new-users">
+    <div class="uniq">
         <IEcharts :option="options" @click="$emit('on-chart-click', $event)"/>
     </div>
 </template>
@@ -8,38 +8,21 @@
     import IEcharts from 'vue-echarts-v3/src/full.js';
 
     export default {
-        name: "NewUsers",
+        name: "UniqUsers",
         components: {
             IEcharts
         },
         props: {
-            logFile: Object
+            uniqUsersByDate: Array
         },
         data: () => ({
             options: {}
         }),
         mounted() {
-            const newUsersByDate = [];
-            for (let key in this.logFile) {
-                const uniqDate =  newUsersByDate.find(uniq => uniq.date == this.logFile[key] );
-                if (uniqDate) {
-                    uniqDate.count++;
-                } else {
-                    newUsersByDate.push({
-                        date: this.logFile[key],
-                        count: 1
-                    });
-                }
-            }
-            newUsersByDate.sort((a, b) => {
-                const aDate = Date.parse(`${a.date.split('.')[2]}-${a.date.split('.')[1]}-${a.date.split('.')[0]}`);
-                const bDate = Date.parse(`${b.date.split('.')[2]}-${b.date.split('.')[1]}-${b.date.split('.')[0]}`);
-                return aDate > bDate ? 1 : -1;
-            });
-            this.options = this.getUniqChart(newUsersByDate);
+            this.options = this.getUniqChart(this.uniqUsersByDate);
         },
         methods: {
-            getUniqChart(newUsersByDate) {
+            getUniqChart(uniqUsersByDate) {
                 return {
                     color: ['#3398DB'],
                     tooltip : {
@@ -48,6 +31,13 @@
                             type : 'shadow'
                         }
                     },
+                    dataZoom: [{
+                        type: 'inside',
+                        start: 80,
+                        end: 100
+                    }, {
+                        type: 'slider'
+                    }],
                     grid: {
                         left: '3%',
                         right: '4%',
@@ -57,7 +47,7 @@
                     xAxis : [
                         {
                             type : 'category',
-                            data : newUsersByDate.map(item => item.date),
+                            data : uniqUsersByDate.map(item => item.date),
                             axisTick: {
                                 alignWithLabel: true
                             }
@@ -70,10 +60,10 @@
                     ],
                     series : [
                         {
-                            name:'new users',
+                            name:'uniq users',
                             type:'bar',
                             barWidth: '60%',
-                            data: newUsersByDate.map(item => item.count)
+                            data: uniqUsersByDate.map(item => item.users.length)
                         }
                     ]
                 };
@@ -83,7 +73,7 @@
 </script>
 
 <style scoped>
-    .new-users {
+    .uniq {
         width: 100%;
         height: 500px;
     }

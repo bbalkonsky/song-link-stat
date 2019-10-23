@@ -89,7 +89,7 @@
 
 <style scoped>
     .services-by-dates {
-        width: 1000px;
+        width: 100%;
         height: 500px;
     }
 </style>

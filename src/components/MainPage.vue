@@ -1,28 +1,43 @@
 <template>
     <div class="main-page">
-        <template v-if="newUsersLoadReady">
-          <new-users
-                  :log-file="usersSignUp"
-                  @on-chart-click="onChartClickHandler">
-          </new-users>
-        </template>
-        <template v-if="byDateChartsLoadReady">
-          <types-by-date
-                  :types="types"
-                  :dates="dates"
-                  :types-by-date="typesByDate"
-                  @on-chart-click="onChartClickHandler">
-          </types-by-date>
-        </template>
-        <template v-if="byDateChartsLoadReady">
-          <services-by-date
-                  :services="services"
-                  :dates="dates"
-                  :services-by-date="servicesByDate"
-                  @on-chart-click="onChartClickHandler">
-          </services-by-date>
-        </template>
-
+        <div class="columns is-multiline">
+            <template v-if="byDateChartsLoadReady">
+                <div class="column is-half">
+                    <uniq-users
+                            :uniq-users-by-date="uniqUsersByDate"
+                            @on-chart-click="onChartClickHandler">
+                    </uniq-users>
+                </div>
+            </template>
+            <template v-if="newUsersLoadReady">
+                <div class="column is-half">
+                    <new-users
+                            :log-file="usersSignUp"
+                            @on-chart-click="onChartClickHandler">
+                    </new-users>
+                </div>
+            </template>
+            <template v-if="byDateChartsLoadReady">
+                <div class="column is-half">
+                    <types-by-date
+                          :types="types"
+                          :dates="dates"
+                          :types-by-date="typesByDate"
+                          @on-chart-click="onChartClickHandler">
+                    </types-by-date>
+                </div>
+            </template>
+            <template v-if="byDateChartsLoadReady">
+                <div class="column is-half">
+                    <services-by-date
+                          :services="services"
+                          :dates="dates"
+                          :services-by-date="servicesByDate"
+                          @on-chart-click="onChartClickHandler">
+                    </services-by-date>
+                </div>
+            </template>
+        </div>
         <b-loading :active="!byDateChartsLoadReady || !newUsersLoadReady"></b-loading>
     </div>
 </template>
@@ -32,10 +47,12 @@
     import NewUsers from "@/components/NewUsers";
     import TypesByDate from "@/components/TypesByDate";
     import ServicesByDate from "@/components/ServicesByDate";
+    import UniqUsers from "@/components/UniqUsers";
 
     export default {
         name: 'MainPage',
         components: {
+            UniqUsers,
             NewUsers,
             TypesByDate,
             ServicesByDate,
@@ -49,8 +66,8 @@
             dates: [],
             typesByDate: [],
             servicesByDate: [],
-            byDateChartsLoadReady: false
-
+            byDateChartsLoadReady: false,
+            uniqUsersByDate: []
         }),
         methods: {
             getFullData(rawArray) {
@@ -112,6 +129,18 @@
                             date: item.date
                         });
                     }
+
+                    const uniqUsers = this.uniqUsersByDate.find(uniq => uniq.date == item.date);
+                    if (uniqUsers) {
+                        if (!uniqUsers.users.includes(item.id)) {
+                            uniqUsers.users.push(item.id);
+                        }
+                    } else {
+                        this.uniqUsersByDate.push({
+                            date: item.date,
+                            users: [item.id]
+                        });
+                    }
                 });
                 this.byDateChartsLoadReady = true;
             },
@@ -122,7 +151,7 @@
         },
         created() {
             axios.get('http://127.0.0.1:5000/').then(response => this.getFullData(response.data));
-        }
+        },
     };
 </script>
 
