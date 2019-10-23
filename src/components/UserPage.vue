@@ -37,37 +37,31 @@
             ]
         }),
         methods: {
-            parseJson(json) {
-                this.getFullData(json.split("', '"))
-            },
             getFullData(rawArray) {
                 rawArray.forEach(item => {
-                    const oneLog = item.split(' | ');
-                    const parseDate = oneLog[8].split(' ');
-
-                    if (oneLog[1] != this.user) return;
-
+                    const parseDate = item.time.split(' ');
                     this.userLog.push(
                         {
-                            type: oneLog[0],
-                            id: oneLog[1],
-                            username: oneLog[2],
-                            name: oneLog[3],
-                            surname: oneLog[4],
-                            groupId: oneLog[5],
-                            groupTitle: oneLog[6],
-                            language: oneLog[7],
+                            type: item.type,
+                            id: item.user_id,
+                            username: item.username,
+                            name: item.first_name,
+                            surname: item.last_name,
+                            groupId: item.chat_id,
+                            groupTitle: item.chat_title,
+                            language: item.language,
                             date: parseDate[0],
-                            service: oneLog[9] == 'itunes' ? 'music.apple' : oneLog[9],
-                            query: oneLog[10]
+                            time:parseDate[1],
+                            service: item.service == 'itunes' ? 'music.apple' : item.service,
+                            query: item.query
                         }
                     );
                 });
             },
         },
         created() {
-            axios.get('data.json').then(response => this.parseJson(response.data.logs));
             this.user = this.$route.params.id;
+            axios.get(`http://127.0.0.1:5000/user/${this.user}`).then(response => this.getFullData(response.data));
         }
     }
 </script>
