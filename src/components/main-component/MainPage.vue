@@ -1,42 +1,50 @@
 <template>
     <div class="main-page">
-        <div class="columns is-multiline">
-            <template v-if="byDateChartsLoadReady">
-                <div class="column is-half">
-                    <uniq-users
-                            :uniq-users-by-date="uniqUsersByDate"
-                            @on-chart-click="onChartClickHandler">
-                    </uniq-users>
-                </div>
-            </template>
-            <template v-if="newUsersLoadReady">
-                <div class="column is-half">
-                    <new-users
-                            :log-file="usersSignUp"
-                            @on-chart-click="onChartClickHandler">
-                    </new-users>
-                </div>
-            </template>
-            <template v-if="byDateChartsLoadReady">
-                <div class="column is-half">
-                    <types-by-date
-                          :types="types"
-                          :dates="dates"
-                          :types-by-date="typesByDate"
-                          @on-chart-click="onChartClickHandler">
-                    </types-by-date>
-                </div>
-            </template>
-            <template v-if="byDateChartsLoadReady">
-                <div class="column is-half">
-                    <services-by-date
-                          :services="services"
-                          :dates="dates"
-                          :services-by-date="servicesByDate"
-                          @on-chart-click="onChartClickHandler">
-                    </services-by-date>
-                </div>
-            </template>
+        <header-hero></header-hero>
+
+        <div class="container">
+            <div class="columns is-multiline">
+                <template v-if="byDateChartsLoadReady">
+                    <div class="column is-half">
+                        <h4 class="title is-4">Unique users</h4>
+                        <uniq-users-chart
+                                :uniq-users-by-date="uniqUsersByDate"
+                                @on-chart-click="onChartClickHandler">
+                        </uniq-users-chart>
+                    </div>
+                </template>
+                <template v-if="newUsersLoadReady">
+                    <div class="column is-half">
+                        <h4 class="title is-4">New users</h4>
+                        <new-users-chart
+                                :log-file="usersSignUp"
+                                @on-chart-click="onChartClickHandler">
+                        </new-users-chart>
+                    </div>
+                </template>
+                <template v-if="byDateChartsLoadReady">
+                    <div class="column is-half">
+                        <h4 class="title is-4">Chat types</h4>
+                        <types-by-date-chart
+                              :types="types"
+                              :dates="dates"
+                              :types-by-date="typesByDate"
+                              @on-chart-click="onChartClickHandler">
+                        </types-by-date-chart>
+                    </div>
+                </template>
+                <template v-if="byDateChartsLoadReady">
+                    <div class="column is-half">
+                        <h4 class="title is-4">Service types</h4>
+                        <services-by-date-chart
+                              :services="services"
+                              :dates="dates"
+                              :services-by-date="servicesByDate"
+                              @on-chart-click="onChartClickHandler">
+                        </services-by-date-chart>
+                    </div>
+                </template>
+            </div>
         </div>
         <b-loading :active="!byDateChartsLoadReady || !newUsersLoadReady"></b-loading>
     </div>
@@ -44,18 +52,20 @@
 
 <script type="text/babel">
     import axios from 'axios'
-    import NewUsers from "@/components/NewUsers";
-    import TypesByDate from "@/components/TypesByDate";
-    import ServicesByDate from "@/components/ServicesByDate";
-    import UniqUsers from "@/components/UniqUsers";
+    import NewUsersChart from "@/components/main-component/charts/NewUsersChart";
+    import TypesByDateChart from "@/components/main-component/charts/TypesByDateChart";
+    import ServicesByDateChart from "@/components/main-component/charts/ServicesByDateChart";
+    import UniqUsersChart from "@/components/main-component/charts/UniqUsersChart";
+    import HeaderHero from "@/components/HeaderHero";
 
     export default {
         name: 'MainPage',
         components: {
-            UniqUsers,
-            NewUsers,
-            TypesByDate,
-            ServicesByDate,
+            HeaderHero,
+            UniqUsersChart,
+            NewUsersChart,
+            TypesByDateChart,
+            ServicesByDateChart,
         },
         data: () => ({
             normLog: [],
@@ -145,7 +155,7 @@
                 this.byDateChartsLoadReady = true;
             },
             onChartClickHandler: function (event) {
-                this.$router.push(`/date/${event.name}`)
+                this.$router.push(`/day/${event.name}`)
             }
 
         },

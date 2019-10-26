@@ -5,9 +5,9 @@ import App from './App.vue'
 import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
 
-import MainPage from "@/components/MainPage";
-import DatePage from "@/components/DatePage";
-import UserPage from "@/components/UserPage";
+import MainPage from "@/components/main-component/MainPage";
+import DayPage from "@/components/day-component/DayPage";
+import UserPage from "@/components/user-component/UserPage";
 
 Vue.config.productionTip = false;
 Vue.use(VueRouter);
@@ -15,7 +15,7 @@ Vue.use(Buefy);
 
 const routes = [
   { path: '/', component: MainPage },
-  { path: '/date/:id', component: DatePage },
+  { path: '/day/:id', component: DayPage },
   { path: '/user/:id', component: UserPage },
 ];
 

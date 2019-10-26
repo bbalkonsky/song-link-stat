@@ -64,7 +64,7 @@
 
 <style scoped>
     .day-types {
-        width: 1000px;
-        height: 500px;
+        width: 100%;
+        height: 250px;
     }
 </style>

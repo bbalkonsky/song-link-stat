@@ -1,0 +1,99 @@
+<template>
+    <div class="user-page">
+        <template v-if="userLog.length">
+            <header-hero
+                    :is-sub-page="true"
+                    :sub-page-header="userLog[userLog.length - 1].username"
+                    :sub-page-sub-header="userLog[userLog.length - 1].name + ' ' + userLog[userLog.length - 1].surname">
+            </header-hero>
+        </template>
+
+        <div class="container">
+            <user-dates-chart :dates="dates" :user-log="userLog" @on-chart-click="onChartClickHandler"/>
+
+            <template v-if="userLog.length">
+                <b-table :data="userLog" :striped="true" :hoverable="true">
+                    <template slot-scope="props">
+                        <b-table-column field="date" label="Date" sortable>
+                            <b-button tag="router-link"
+                                      :to="'/day/' + props.row.date"
+                                      type="is-light" inverted outlined>
+                                {{props.row.date}}
+                            </b-button>
+                        </b-table-column>
+                        <b-table-column field="service" label="Service" sortable>
+                            {{ props.row.service }}
+                        </b-table-column>
+                        <b-table-column field="type" label="Type" sortable>
+                            {{ props.row.type }}
+                        </b-table-column>
+                        <b-table-column field="query" label="Query">
+                            {{ props.row.query }}
+                        </b-table-column>
+                    </template>
+                </b-table>
+            </template>
+        </div>
+
+        <b-loading :active="!userLog.length"></b-loading>
+    </div>
+</template>
+
+<script>
+    import axios from 'axios';
+    import HeaderHero from "@/components/HeaderHero";
+    import UserDatesChart from "@/components/user-component/charts/UserDatesChart";
+
+    export default {
+        name: "UserPage",
+        components: {
+            UserDatesChart,
+            HeaderHero
+        },
+        data: () => ({
+            userLog: [],
+            user: '',
+            dates: [],
+            chartsData: [],
+            options: {},
+            isChartReadyToShow: false
+        }),
+        methods: {
+            getFullData(rawArray) {
+                rawArray.forEach(item => {
+                    const parseDate = item.time.split(' ');
+                    this.userLog.push(
+                        {
+                            type: item.type,
+                            id: item.user_id,
+                            username: item.username,
+                            name: item.first_name,
+                            surname: item.last_name,
+                            groupId: item.chat_id,
+                            groupTitle: item.chat_title,
+                            language: item.language,
+                            date: parseDate[0],
+                            time:parseDate[1],
+                            service: item.service == 'itunes' ? 'music.apple' : item.service,
+                            query: item.query
+                        }
+                    );
+                    if (!this.dates.includes(parseDate[0])) {
+                        this.dates.push(parseDate[0])
+                    }
+                });
+            },
+            onChartClickHandler: function (event) {
+                this.$router.push(`/day/${event.name}`)
+            }
+        },
+        created() {
+            this.user = this.$route.params.id;
+            axios.get(`http://127.0.0.1:5000/user/${this.user}`).then(response => this.getFullData(response.data));
+        }
+    }
+</script>
+
+<style scoped>
+
+</style>
