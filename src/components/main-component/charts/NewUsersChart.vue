@@ -15,32 +15,37 @@
         props: {
             logFile: Object
         },
+        watch: {
+            logFile: function () {
+                this.getUniqChart();
+            }
+        },
         data: () => ({
             options: {}
         }),
         mounted() {
-            const newUsersByDate = [];
-            for (let key in this.logFile) {
-                const uniqDate =  newUsersByDate.find(uniq => uniq.date == this.logFile[key] );
-                if (uniqDate) {
-                    uniqDate.count++;
-                } else {
-                    newUsersByDate.push({
-                        date: this.logFile[key],
-                        count: 1
-                    });
-                }
-            }
-            newUsersByDate.sort((a, b) => {
-                const aDate = Date.parse(`${a.date.split('.')[2]}-${a.date.split('.')[1]}-${a.date.split('.')[0]}`);
-                const bDate = Date.parse(`${b.date.split('.')[2]}-${b.date.split('.')[1]}-${b.date.split('.')[0]}`);
-                return aDate > bDate ? 1 : -1;
-            });
-            this.options = this.getUniqChart(newUsersByDate);
+            this.getUniqChart();
         },
         methods: {
-            getUniqChart(newUsersByDate) {
-                return {
+            getUniqChart() {
+                const newUsersByDate = [];
+                for (let key in this.logFile) {
+                    const uniqDate =  newUsersByDate.find(uniq => uniq.date == this.logFile[key] );
+                    if (uniqDate) {
+                        uniqDate.count++;
+                    } else {
+                        newUsersByDate.push({
+                            date: this.logFile[key],
+                            count: 1
+                        });
+                    }
+                }
+                newUsersByDate.sort((a, b) => {
+                    const aDate = Date.parse(`${a.date.split('.')[2]}-${a.date.split('.')[1]}-${a.date.split('.')[0]}`);
+                    const bDate = Date.parse(`${b.date.split('.')[2]}-${b.date.split('.')[1]}-${b.date.split('.')[0]}`);
+                    return aDate > bDate ? 1 : -1;
+                });
+                this.options = {
                     color: ['#3398DB'],
                     tooltip : {
                         trigger: 'axis',

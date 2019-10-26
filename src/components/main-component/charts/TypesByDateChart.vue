@@ -17,27 +17,32 @@
             types: Array,
             typesByDate: Array
         },
+        watch: {
+            types: function () {
+                this.getTypesChart();
+            }
+        },
         data: () => ({
             seriesData: {},
             options: {}
         }),
         mounted() {
-            this.types.forEach(type => {
-                this.seriesData[type] = [];
-                this.dates.forEach(date => {
-                    const typeDate = this.typesByDate.find(item => item.type == type && item.date == date);
-                    if (typeDate) {
-                        this.seriesData[type].push(typeDate.count);
-                    } else {
-                        this.seriesData[type].push(null);
-                    }
-                });
-            });
-            this.options = this.getTypesChart();
+           this.getTypesChart();
         },
         methods: {
             getTypesChart() {
-                return {
+                this.types.forEach(type => {
+                    this.seriesData[type] = [];
+                    this.dates.forEach(date => {
+                        const typeDate = this.typesByDate.find(item => item.type == type && item.date == date);
+                        if (typeDate) {
+                            this.seriesData[type].push(typeDate.count);
+                        } else {
+                            this.seriesData[type].push(null);
+                        }
+                    });
+                });
+                this.options = {
                     tooltip: {
                         trigger: 'axis',
                         axisPointer : {
@@ -47,13 +52,13 @@
                     legend: {
                         show: true
                     },
-                    dataZoom: [{
-                        type: 'inside',
-                        start: 80,
-                        end: 100
-                    }, {
-                        type: 'slider'
-                    }],
+                    // dataZoom: [{
+                    //     type: 'inside',
+                    //     start: 80,
+                    //     end: 100
+                    // }, {
+                    //     type: 'slider'
+                    // }],
                     grid: {
                         left: '3%',
                         right: '4%',

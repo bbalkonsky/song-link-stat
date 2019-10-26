@@ -22,7 +22,9 @@
                             </b-button>
                         </b-table-column>
                         <b-table-column field="service" label="Service" sortable>
-                            {{ props.row.service }}
+                            <span class="tag" :class="getTagClass(props.row.service)">
+                                {{ props.row.service }}
+                            </span>
                         </b-table-column>
                         <b-table-column field="type" label="Type" sortable>
                             {{ props.row.type }}
@@ -85,7 +87,17 @@
             },
             onChartClickHandler: function (event) {
                 this.$router.push(`/day/${event.name}`)
-            }
+            },
+            getTagClass(service){
+                return {
+                    'is-success': service == 'spotify',
+                    'is-info': service == 'music.apple',
+                    'is-primary': service == 'deezer',
+                    'is-warning': service == 'yandex',
+                    'is-danger': service == 'music.youtube' || service == 'youtube',
+                    'is-dark': service == 'soundcloud',
+                }
+            },
         },
         created() {
             this.user = this.$route.params.id;

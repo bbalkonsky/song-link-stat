@@ -17,27 +17,32 @@
             services: Array,
             servicesByDate: Array
         },
+        watch: {
+            services: function () {
+                this.getServicesChart()
+            }
+        },
         data: () => ({
             seriesData: {},
             options: {}
         }),
         mounted() {
-            this.services.forEach(service => {
-                this.seriesData[service] = [];
-                this.dates.forEach(date => {
-                    const serviceDate = this.servicesByDate.find(item => item.service == service && item.date == date);
-                    if (serviceDate) {
-                        this.seriesData[service].push(serviceDate.count);
-                    } else {
-                        this.seriesData[service].push(null);
-                    }
-                });
-            });
-            this.options = this.getServicesChart();
+            this.getServicesChart()
         },
         methods: {
             getServicesChart() {
-                return {
+                this.services.forEach(service => {
+                    this.seriesData[service] = [];
+                    this.dates.forEach(date => {
+                        const serviceDate = this.servicesByDate.find(item => item.service == service && item.date == date);
+                        if (serviceDate) {
+                            this.seriesData[service].push(serviceDate.count);
+                        } else {
+                            this.seriesData[service].push(null);
+                        }
+                    });
+                });
+                this.options = {
                     tooltip: {
                         trigger: 'axis',
                         axisPointer : {
@@ -47,13 +52,13 @@
                     legend: {
                         show: true
                     },
-                    dataZoom: [{
-                        type: 'inside',
-                        start: 80,
-                        end: 100
-                    }, {
-                        type: 'slider'
-                    }],
+                    // dataZoom: [{
+                    //     type: 'inside',
+                    //     start: 80,
+                    //     end: 100
+                    // }, {
+                    //     type: 'slider'
+                    // }],
                     grid: {
                         left: '3%',
                         right: '4%',

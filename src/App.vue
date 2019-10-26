@@ -13,13 +13,10 @@
 </template>
 
 <script type="text/babel">
-  import axios from 'axios'
-
   export default {
     name: 'app',
     data() {
       return {
-        usersList: [],
         isActive: true
       }
     },
@@ -27,7 +24,6 @@
 
     },
     created() {
-      axios.get('http://127.0.0.1:5000/users').then(response => this.usersList = response.data);
     }
   };
 </script>

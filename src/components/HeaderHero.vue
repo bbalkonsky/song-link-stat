@@ -26,6 +26,22 @@
                             </span>
                         </div>
                     </div>
+                    <div v-else class="navbar-menu">
+                        <div class="navbar-end">
+                            <span class="navbar-item">
+                                <b-dropdown aria-role="list" @change="$emit('period-changed', $event)">
+                                    <button class="button is-dark" slot="trigger">
+                                        <span>Change period</span>
+                                        <b-icon icon="menu-down"></b-icon>
+                                    </button>
+
+                                    <b-dropdown-item aria-role="listitem" value="2019-09-20">Month</b-dropdown-item>
+                                    <b-dropdown-item aria-role="listitem" value="2019-10-13">Week</b-dropdown-item>
+                                    <b-dropdown-item aria-role="listitem" value="all">All time</b-dropdown-item>
+                                </b-dropdown>
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </nav>
         </div>
@@ -64,7 +80,7 @@
         methods: {
             getRndInteger(min, max) {
                 return Math.floor(Math.random() * (max - min + 1) ) + min;
-            }
+            },
         }
     }
 </script>

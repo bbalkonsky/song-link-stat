@@ -15,15 +15,20 @@
         props: {
             uniqUsersByDate: Array
         },
+        watch: {
+            uniqUsersByDate: function () {
+                this.getUniqChart();
+            }
+        },
         data: () => ({
             options: {}
         }),
         mounted() {
-            this.options = this.getUniqChart(this.uniqUsersByDate);
+             this.getUniqChart();
         },
         methods: {
-            getUniqChart(uniqUsersByDate) {
-                return {
+            getUniqChart() {
+                this.options = {
                     color: ['#3398DB'],
                     tooltip : {
                         trigger: 'axis',
@@ -31,13 +36,13 @@
                             type : 'shadow'
                         }
                     },
-                    dataZoom: [{
-                        type: 'inside',
-                        start: 80,
-                        end: 100
-                    }, {
-                        type: 'slider'
-                    }],
+                    // dataZoom: [{
+                    //     type: 'inside',
+                    //     start: 80,
+                    //     end: 100
+                    // }, {
+                    //     type: 'slider'
+                    // }],
                     grid: {
                         left: '3%',
                         right: '4%',
@@ -47,7 +52,7 @@
                     xAxis : [
                         {
                             type : 'category',
-                            data : uniqUsersByDate.map(item => item.date),
+                            data : this.uniqUsersByDate.map(item => item.date),
                             axisTick: {
                                 alignWithLabel: true
                             }
@@ -63,7 +68,7 @@
                             name:'uniq users',
                             type:'bar',
                             barWidth: '60%',
-                            data: uniqUsersByDate.map(item => item.users.length)
+                            data: this.uniqUsersByDate.map(item => item.users.length)
                         }
                     ]
                 };

@@ -1,6 +1,6 @@
 <template>
     <div class="main-page">
-        <header-hero></header-hero>
+        <header-hero @period-changed="dropdownClickHandler" />
 
         <div class="container">
             <div class="columns is-multiline">
@@ -81,6 +81,15 @@
         }),
         methods: {
             getFullData(rawArray) {
+                this.normLog = [];
+                this.usersSignUp = {};
+                this.dates = [];
+                this.services = [];
+                this.types = [];
+                this.uniqUsersByDate = [];
+                this.byDateChartsLoadReady = false;
+                this.newUsersLoadReady = false;
+
                 rawArray.forEach(item => {
                     const parseDate = item.time.split(' ')[0];
                     this.normLog.push(
@@ -156,11 +165,13 @@
             },
             onChartClickHandler: function (event) {
                 this.$router.push(`/day/${event.name}`)
+            },
+            dropdownClickHandler: function (event) {
+                axios.get(`http://127.0.0.1:5000/period/${event}`).then(response => this.getFullData(response.data));
             }
-
         },
         created() {
-            axios.get('http://127.0.0.1:5000/').then(response => this.getFullData(response.data));
+            axios.get('http://127.0.0.1:5000/period/2019-09-20').then(response => this.getFullData(response.data));
         },
     };
 </script>
