@@ -13,28 +13,56 @@
             IEcharts
         },
         props: {
-            dates: Array,
-            services: Array,
-            servicesByDate: Array
+            log: Array
         },
         watch: {
-            services: function () {
+            log: function () {
                 this.getServicesChart()
             }
         },
         data: () => ({
             seriesData: {},
-            options: {}
+            options: {},
+            services: [],
+            dates: [],
+            servicesByDate: []
         }),
         mounted() {
             this.getServicesChart()
         },
         methods: {
             getServicesChart() {
+                this.services = [];
+                this.dates = [];
+                this.servicesByDate = [];
+
+                this.log.forEach(item => {
+                    if (!this.services.find(service => service === item.service)) {
+                        this.services.push(item.service);
+                    }
+
+                    if (!this.dates.find(date => date === item.date)) {
+                        this.dates.push(item.date);
+                    }
+
+                    const service = this.servicesByDate.find(type => type.service === item.service && type.date === item.date);
+                    if (service) {
+                        service.count++;
+                    } else {
+                        this.servicesByDate.push({
+                            service: item.service,
+                            count: 1,
+                            date: item.date
+                        });
+                    }
+                });
+
+
+
                 this.services.forEach(service => {
                     this.seriesData[service] = [];
                     this.dates.forEach(date => {
-                        const serviceDate = this.servicesByDate.find(item => item.service == service && item.date == date);
+                        const serviceDate = this.servicesByDate.find(item => item.service === service && item.date === date);
                         if (serviceDate) {
                             this.seriesData[service].push(serviceDate.count);
                         } else {

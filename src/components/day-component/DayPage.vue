@@ -110,7 +110,7 @@
         },
         created() {
             this.today = this.$route.params.id;
-            axios.get(`http://127.0.0.1:5000/day/${this.today}`).then(response => this.getFullData(response.data));
+            axios.get(`http://80.211.14.35/day/${this.today}`).then(response => this.getFullData(response.data));
         }
     }
 </script>

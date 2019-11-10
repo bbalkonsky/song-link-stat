@@ -1,5 +1,5 @@
 <template>
-    <div class="uniq">
+    <div class="types-by-dates">
         <IEcharts :option="options" @click="$emit('on-chart-click', $event)"/>
     </div>
 </template>
@@ -8,7 +8,7 @@
     import IEcharts from 'vue-echarts-v3/src/full.js';
 
     export default {
-        name: "UniqUsers",
+        name: "CountByDateChart",
         components: {
             IEcharts
         },
@@ -17,49 +17,59 @@
         },
         watch: {
             log: function () {
-                this.getUniqChart();
+                this.getTypesChart();
             }
         },
         data: () => ({
+            byDate: [],
             options: {},
-            uniqUsersByDate: []
+            trends: []
         }),
         mounted() {
-             this.getUniqChart();
+            this.getTypesChart();
         },
         methods: {
-            getUniqChart() {
-                this.uniqUsersByDate = [];
-
+            getTypesChart() {
+                this.byDate = [];
                 this.log.forEach(item => {
-                    const uniqUsers = this.uniqUsersByDate.find(uniq => uniq.date === item.date);
-                    if (uniqUsers) {
-                        if (!uniqUsers.users.includes(item.id)) {
-                            uniqUsers.users.push(item.id);
-                        }
+                    const dateCount = this.byDate.find(date => date.date === item.date);
+                    if (dateCount) {
+                        dateCount.count++;
                     } else {
-                        this.uniqUsersByDate.push({
+                        this.byDate.push({
                             date: item.date,
-                            users: [item.id]
+                            count: 1
                         });
                     }
                 });
 
+                this.trends = [];
+                this.byDate.forEach((item, idx) => {
+                    let trend = 0;
+                    if (idx > 6) {
+                        for (let i = idx - 6; i <= idx; i++) {
+                            trend += this.byDate[i].count;
+                        }
+                        this.trends.push(Math.floor(trend / 7));
+                    } else if (idx === 0) {
+                        this.trends.push(this.byDate[0].count);
+                    } else {
+                        for (let i = 0; i <= idx; i++) {
+                            trend += this.byDate[i].count;
+                        }
+                        this.trends.push(Math.floor(trend / (idx + 1)));
+                    }
+                });
+
+
                 this.options = {
-                    // color: ['#3398DB'],
+                    // color: ['#262edb'],
                     tooltip : {
                         trigger: 'axis',
                         axisPointer : {
                             type : 'shadow'
                         }
                     },
-                    // dataZoom: [{
-                    //     type: 'inside',
-                    //     start: 80,
-                    //     end: 100
-                    // }, {
-                    //     type: 'slider'
-                    // }],
                     grid: {
                         left: '3%',
                         right: '4%',
@@ -69,7 +79,7 @@
                     xAxis : [
                         {
                             type : 'category',
-                            data : this.uniqUsersByDate.map(item => item.date),
+                            data : this.byDate.map(item => item.date),
                             axisTick: {
                                 alignWithLabel: true
                             }
@@ -78,14 +88,19 @@
                     yAxis : [
                         {
                             type : 'value'
-                        }
+                        },
                     ],
                     series : [
                         {
-                            name:'uniq users',
+                            name:'users',
                             type:'bar',
                             barWidth: '60%',
-                            data: this.uniqUsersByDate.map(item => item.users.length)
+                            data: this.byDate.map(item => item.count)
+                        },
+                        {
+                            name:'trend',
+                            type:'line',
+                            data: this.trends
                         }
                     ]
                 };
@@ -95,7 +110,7 @@
 </script>
 
 <style scoped>
-    .uniq {
+    .types-by-dates {
         width: 100%;
         height: 500px;
     }

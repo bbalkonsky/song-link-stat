@@ -13,28 +13,56 @@
             IEcharts
         },
         props: {
-            dates: Array,
-            types: Array,
-            typesByDate: Array
+            log: Array
         },
         watch: {
-            types: function () {
+            log: function () {
                 this.getTypesChart();
             }
         },
         data: () => ({
             seriesData: {},
-            options: {}
+            options: {},
+            types: [],
+            dates: [],
+            typesByDate: []
         }),
         mounted() {
            this.getTypesChart();
         },
         methods: {
             getTypesChart() {
+                this.types = [];
+                this.dates = [];
+                this.typesByDate = [];
+
+                this.log.forEach(item => {
+                    if (!this.types.find(type => type === item.type)) {
+                        this.types.push(item.type);
+                    }
+
+                    if (!this.dates.find(date => date === item.date)) {
+                        this.dates.push(item.date);
+                    }
+
+                    const type = this.typesByDate.find(type => type.type === item.type && type.date === item.date);
+                    if (type) {
+                        type.count++;
+                    } else {
+                        this.typesByDate.push({
+                            type: item.type,
+                            count: 1,
+                            date: item.date
+                        });
+                    }
+                });
+
+
+
                 this.types.forEach(type => {
                     this.seriesData[type] = [];
                     this.dates.forEach(date => {
-                        const typeDate = this.typesByDate.find(item => item.type == type && item.date == date);
+                        const typeDate = this.typesByDate.find(item => item.type === type && item.date === date);
                         if (typeDate) {
                             this.seriesData[type].push(typeDate.count);
                         } else {

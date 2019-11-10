@@ -4,11 +4,19 @@
 
         <div class="container">
             <div class="columns is-multiline">
+                <template v-if="parsedLog.length">
+                    <div class="column is-half">
+                        <h4 class="title is-4">Average by week</h4>
+                        <average-by-week-chart
+                                :log="parsedLog" />
+                    </div>
+                </template>
+
                 <template v-if="byDateChartsLoadReady">
                     <div class="column is-half">
                         <h4 class="title is-4">Unique users</h4>
                         <uniq-users-chart
-                                :uniq-users-by-date="uniqUsersByDate"
+                                :log="parsedLog"
                                 @on-chart-click="onChartClickHandler">
                         </uniq-users-chart>
                     </div>
@@ -17,31 +25,42 @@
                     <div class="column is-half">
                         <h4 class="title is-4">New users</h4>
                         <new-users-chart
-                                :log-file="usersSignUp"
+                                :log="parsedLog"
                                 @on-chart-click="onChartClickHandler">
                         </new-users-chart>
                     </div>
                 </template>
+
                 <template v-if="byDateChartsLoadReady">
                     <div class="column is-half">
-                        <h4 class="title is-4">Chat types</h4>
-                        <types-by-date-chart
-                              :types="types"
-                              :dates="dates"
-                              :types-by-date="typesByDate"
-                              @on-chart-click="onChartClickHandler">
-                        </types-by-date-chart>
-                    </div>
-                </template>
-                <template v-if="byDateChartsLoadReady">
-                    <div class="column is-half">
-                        <h4 class="title is-4">Service types</h4>
-                        <services-by-date-chart
-                              :services="services"
-                              :dates="dates"
-                              :services-by-date="servicesByDate"
-                              @on-chart-click="onChartClickHandler">
-                        </services-by-date-chart>
+                        <h4 class="title is-4">
+                            <section style="display: inline-block; height: 0;">
+                                <b-field>
+                                    <b-radio-button v-model="dayCountRadio"
+                                                    name="name"
+                                                    native-value="count-by-date-chart">
+                                        Summ
+                                    </b-radio-button>
+                                    <b-radio-button v-model="dayCountRadio"
+                                                    name="name"
+                                                    native-value="services-by-date-chart">
+                                        Services
+                                    </b-radio-button>
+                                    <b-radio-button v-model="dayCountRadio"
+                                                    name="name"
+                                                    native-value="types-by-date-chart">
+                                        Types
+                                    </b-radio-button>
+                                </b-field>
+                            </section>
+                        </h4>
+
+                        <keep-alive>
+                            <component v-bind:is="dayCountRadio"
+                                  :log="this.parsedLog"
+                                  @on-chart-click="onChartClickHandler">
+                            </component>
+                        </keep-alive>
                     </div>
                 </template>
             </div>
@@ -53,14 +72,18 @@
 <script type="text/babel">
     import axios from 'axios'
     import NewUsersChart from "@/components/main-component/charts/NewUsersChart";
-    import TypesByDateChart from "@/components/main-component/charts/TypesByDateChart";
-    import ServicesByDateChart from "@/components/main-component/charts/ServicesByDateChart";
+    import TypesByDateChart from "@/components/main-component/charts/by-day-charts/TypesByDateChart";
+    import ServicesByDateChart from "@/components/main-component/charts/by-day-charts/ServicesByDateChart";
     import UniqUsersChart from "@/components/main-component/charts/UniqUsersChart";
     import HeaderHero from "@/components/HeaderHero";
+    import AverageByWeekChart from "@/components/main-component/charts/AverageByWeekChart";
+    import CountByDateChart from "@/components/main-component/charts/by-day-charts/CountByDateChart";
 
     export default {
         name: 'MainPage',
         components: {
+            CountByDateChart,
+            AverageByWeekChart,
             HeaderHero,
             UniqUsersChart,
             NewUsersChart,
@@ -68,31 +91,18 @@
             ServicesByDateChart,
         },
         data: () => ({
-            normLog: [],
-            usersSignUp: {},
+            parsedLog: [],
             newUsersLoadReady: false,
-            types: [],
-            services: [],
-            dates: [],
-            typesByDate: [],
-            servicesByDate: [],
             byDateChartsLoadReady: false,
-            uniqUsersByDate: []
+            dayCountRadio: 'count-by-date-chart'
         }),
         methods: {
-            getFullData(rawArray) {
-                this.normLog = [];
-                this.usersSignUp = {};
-                this.dates = [];
-                this.services = [];
-                this.types = [];
-                this.uniqUsersByDate = [];
-                this.byDateChartsLoadReady = false;
-                this.newUsersLoadReady = false;
+            getFullData(rawLog) {
+                this.componentInitialization();
 
-                rawArray.forEach(item => {
+                rawLog.forEach(item => {
                     const parseDate = item.time.split(' ')[0];
-                    this.normLog.push(
+                    this.parsedLog.push(
                         {
                             type: item.type,
                             id: item.user_id,
@@ -107,71 +117,28 @@
                             query: item.query
                         }
                     );
-                    if (!this.usersSignUp[item.user_id]) {
-                        this.usersSignUp[item.user_id] = parseDate;
-                    }
                 });
 
                 this.newUsersLoadReady = true;
-                this.getMetaDataArrays(this.normLog);
-            },
-            getMetaDataArrays(logArray) {
-                logArray.forEach(item => {
-                    if (!this.types.find(type => type == item.type)) {
-                        this.types.push(item.type);
-                    }
-                    if (!this.services.find(service => service == item.service)) {
-                        this.services.push(item.service);
-                    }
-                    if (!this.dates.find(date => date == item.date)) {
-                        this.dates.push(item.date);
-                    }
-
-                    const type = this.typesByDate.find(type => type.type == item.type && type.date == item.date);
-                    if (type) {
-                        type.count++;
-                    } else {
-                        this.typesByDate.push({
-                            type: item.type,
-                            count: 1,
-                            date: item.date
-                        });
-                    }
-
-                    const service = this.servicesByDate.find(type => type.service == item.service && type.date == item.date);
-                    if (service) {
-                        service.count++;
-                    } else {
-                        this.servicesByDate.push({
-                            service: item.service,
-                            count: 1,
-                            date: item.date
-                        });
-                    }
-
-                    const uniqUsers = this.uniqUsersByDate.find(uniq => uniq.date == item.date);
-                    if (uniqUsers) {
-                        if (!uniqUsers.users.includes(item.id)) {
-                            uniqUsers.users.push(item.id);
-                        }
-                    } else {
-                        this.uniqUsersByDate.push({
-                            date: item.date,
-                            users: [item.id]
-                        });
-                    }
-                });
                 this.byDateChartsLoadReady = true;
             },
             onChartClickHandler: function (event) {
                 this.$router.push(`/day/${event.name}`)
             },
             dropdownClickHandler: function (event) {
-                axios.get(`http://127.0.0.1:5000/period/${event}`).then(response => this.getFullData(response.data));
+                this.getDataFromServer(event);
+            },
+            componentInitialization() {
+                this.parsedLog = [];
+                this.byDateChartsLoadReady = false;
+                this.newUsersLoadReady = false;
+            },
+            getDataFromServer(period) {
+                axios.get(`http://80.211.14.35/period/${period}`).then(response => this.getFullData(response.data));
             }
         },
         created() {
-            axios.get('http://127.0.0.1:5000/period/2019-09-20').then(response => this.getFullData(response.data));
+            this.getDataFromServer('month');
         },
     };
 </script>

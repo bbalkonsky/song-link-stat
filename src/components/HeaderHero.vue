@@ -10,7 +10,7 @@
                         </div>
                         <div v-else>
                             <h1 class="navbar-item title">SongLink bot statistics</h1>
-                            <h2 class="navbar-item subtitle">best unused service</h2>
+                            <h2 class="navbar-item subtitle">best useless service</h2>
                         </div>
                     </div>
 
@@ -35,8 +35,9 @@
                                         <b-icon icon="menu-down"></b-icon>
                                     </button>
 
-                                    <b-dropdown-item aria-role="listitem" value="2019-09-20">Month</b-dropdown-item>
-                                    <b-dropdown-item aria-role="listitem" value="2019-10-13">Week</b-dropdown-item>
+                                    <b-dropdown-item aria-role="listitem" value="month">Month</b-dropdown-item>
+                                    <b-dropdown-item aria-role="listitem" value="week">Week</b-dropdown-item>
+                                    <b-dropdown-item aria-role="listitem" value="year">Year</b-dropdown-item>
                                     <b-dropdown-item aria-role="listitem" value="all">All time</b-dropdown-item>
                                 </b-dropdown>
                             </span>

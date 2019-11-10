@@ -101,7 +101,7 @@
         },
         created() {
             this.user = this.$route.params.id;
-            axios.get(`http://127.0.0.1:5000/user/${this.user}`).then(response => this.getFullData(response.data));
+            axios.get(`http://80.211.14.35/user/${this.user}`).then(response => this.getFullData(response.data));
         }
     }
 </script>

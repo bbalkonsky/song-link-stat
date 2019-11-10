@@ -13,29 +13,38 @@
             IEcharts
         },
         props: {
-            logFile: Object
+            log: Array
         },
         watch: {
-            logFile: function () {
+            log: function () {
                 this.getUniqChart();
             }
         },
         data: () => ({
-            options: {}
+            options: {},
+            usersSignUp: []
         }),
         mounted() {
             this.getUniqChart();
         },
         methods: {
             getUniqChart() {
+                this.usersSignUp = [];
+
+                this.log.forEach(item => {
+                    if (!this.usersSignUp[item.id]) {
+                        this.usersSignUp[item.id] = item.date;
+                    }
+                });
+
                 const newUsersByDate = [];
-                for (let key in this.logFile) {
-                    const uniqDate =  newUsersByDate.find(uniq => uniq.date == this.logFile[key] );
+                for (let key in this.usersSignUp) {
+                    const uniqDate =  newUsersByDate.find(uniq => uniq.date == this.usersSignUp[key] );
                     if (uniqDate) {
                         uniqDate.count++;
                     } else {
                         newUsersByDate.push({
-                            date: this.logFile[key],
+                            date: this.usersSignUp[key],
                             count: 1
                         });
                     }
@@ -46,7 +55,7 @@
                     return aDate > bDate ? 1 : -1;
                 });
                 this.options = {
-                    color: ['#3398DB'],
+                    // color: ['#3398DB'],
                     tooltip : {
                         trigger: 'axis',
                         axisPointer : {
