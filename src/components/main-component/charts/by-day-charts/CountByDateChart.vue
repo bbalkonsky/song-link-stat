@@ -47,14 +47,14 @@
                 this.byDate.forEach((item, idx) => {
                     let trend = 0;
                     if (idx > 6) {
-                        for (let i = idx - 6; i <= idx; i++) {
+                        for (let i = idx - 6; i < idx; i++) {
                             trend += this.byDate[i].count;
                         }
                         this.trends.push(Math.floor(trend / 7));
                     } else if (idx === 0) {
-                        this.trends.push(this.byDate[0].count);
+                        this.trends.push(Math.floor((this.byDate[0].count + this.byDate[1].count) / 2));
                     } else {
-                        for (let i = 0; i <= idx; i++) {
+                        for (let i = 0; i < idx; i++) {
                             trend += this.byDate[i].count;
                         }
                         this.trends.push(Math.floor(trend / (idx + 1)));

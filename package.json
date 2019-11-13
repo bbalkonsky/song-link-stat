@@ -11,6 +11,7 @@
     "axios": "^0.19.0",
     "buefy": "^0.8.5",
     "core-js": "^3.1.2",
+    "date-and-time": "^0.10.0",
     "echarts": "^4.4.0",
     "vue": "^2.6.10",
     "vue-echarts-v3": "^2.0.1",

@@ -1,11 +1,13 @@
 <template>
-    <div class="new-users">
+    <div class="new-users" v-if="logLoaded">
         <IEcharts :option="options" @click="$emit('on-chart-click', $event)"/>
     </div>
 </template>
 
 <script>
+    import axios from 'axios'
     import IEcharts from 'vue-echarts-v3/src/full.js';
+    import date from 'date-and-time';
 
     export default {
         name: "NewUsers",
@@ -13,33 +15,42 @@
             IEcharts
         },
         props: {
-            log: Array
+            period: String
         },
         watch: {
-            log: function () {
-                this.getUniqChart();
+            period: () => {
             }
         },
         data: () => ({
             options: {},
-            usersSignUp: []
+            usersSignUp: {},
+            logLoaded: false,
+            fittedUsersSignUp: []
         }),
-        mounted() {
-            this.getUniqChart();
+        created() {
+            this.getDataFromServer();
         },
         methods: {
-            getUniqChart() {
-                this.usersSignUp = [];
-
-                this.log.forEach(item => {
-                    if (!this.usersSignUp[item.id]) {
-                        this.usersSignUp[item.id] = item.date;
+            getDataFromServer() {
+                axios.get(`http://80.211.14.35/period/year`)
+                    .then(response => this.getNewUsers(response.data))
+                    .then(() => this.logLoaded = true)
+            },
+            getNewUsers(rawLog) {
+                rawLog.forEach(item => {
+                    if (!this.usersSignUp[item.user_id]) {
+                        this.usersSignUp[item.user_id] = item.time.split(' ')[0];
+                        // this.usersSignUp[item.user_id] = new Date(item.time);
                     }
                 });
 
-                const newUsersByDate = [];
+                this.getUniqChart();
+                this.periodChanged();
+            },
+            getUniqChart() {
+                let newUsersByDate = [];
                 for (let key in this.usersSignUp) {
-                    const uniqDate =  newUsersByDate.find(uniq => uniq.date == this.usersSignUp[key] );
+                    const uniqDate =  newUsersByDate.find(uniq => uniq.date === this.usersSignUp[key] );
                     if (uniqDate) {
                         uniqDate.count++;
                     } else {
@@ -49,6 +60,13 @@
                         });
                     }
                 }
+
+                if (this.period === 'month') {
+                    newUsersByDate = this.filterData(newUsersByDate, 30);
+                } else if (this.period === 'week') {
+                    newUsersByDate = this.filterData(newUsersByDate, 7);
+                }
+
                 newUsersByDate.sort((a, b) => {
                     const aDate = Date.parse(`${a.date.split('.')[2]}-${a.date.split('.')[1]}-${a.date.split('.')[0]}`);
                     const bDate = Date.parse(`${b.date.split('.')[2]}-${b.date.split('.')[1]}-${b.date.split('.')[0]}`);
@@ -91,6 +109,23 @@
                         }
                     ]
                 };
+
+                this.logLoaded = true;
+            },
+            filterData(list, days) {
+                let now = date.addDays(new Date(), -days).getTime();
+                return list.filter(item => date.parse(item.date, 'YYYY-MM-DD').getTime() > now);
+            },
+            periodChanged() {
+                // const now = new Date();
+                // now.setDate(now.getDate() - 30);
+                //
+                // this.fittedUsersSignUp = this.usersSignUp.filter(user => {
+                //     const userDate = date.parse(user, 'YYYY-MM-DD');
+                //
+                //     // eslint-disable-next-line no-console
+                //     console.log( userDate >= now);
+                // });
             }
         }
     }

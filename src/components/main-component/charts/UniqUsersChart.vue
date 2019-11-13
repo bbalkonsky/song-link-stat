@@ -22,7 +22,8 @@
         },
         data: () => ({
             options: {},
-            uniqUsersByDate: []
+            uniqUsersByDate: [],
+            trends: []
         }),
         mounted() {
              this.getUniqChart();
@@ -30,18 +31,37 @@
         methods: {
             getUniqChart() {
                 this.uniqUsersByDate = [];
-
                 this.log.forEach(item => {
                     const uniqUsers = this.uniqUsersByDate.find(uniq => uniq.date === item.date);
                     if (uniqUsers) {
                         if (!uniqUsers.users.includes(item.id)) {
                             uniqUsers.users.push(item.id);
+                            uniqUsers.count++;
                         }
                     } else {
                         this.uniqUsersByDate.push({
                             date: item.date,
-                            users: [item.id]
+                            users: [item.id],
+                            count: 1
                         });
+                    }
+                });
+
+                this.trends = [];
+                this.uniqUsersByDate.forEach((item, idx) => {
+                    let trend = 0;
+                    if (idx > 6) {
+                        for (let i = idx - 6; i < idx; i++) {
+                            trend += this.uniqUsersByDate[i].count;
+                        }
+                        this.trends.push(Math.floor(trend / 7));
+                    } else if (idx === 0) {
+                        this.trends.push(Math.floor((this.uniqUsersByDate[0].count + this.uniqUsersByDate[1].count) / 2));
+                    } else {
+                        for (let i = 0; i < idx; i++) {
+                            trend += this.uniqUsersByDate[i].count;
+                        }
+                        this.trends.push(Math.floor(trend / (idx + 1)));
                     }
                 });
 
@@ -85,7 +105,12 @@
                             name:'uniq users',
                             type:'bar',
                             barWidth: '60%',
-                            data: this.uniqUsersByDate.map(item => item.users.length)
+                            data: this.uniqUsersByDate.map(item => item.count)
+                        },
+                        {
+                            name:'trend',
+                            type:'line',
+                            data: this.trends
                         }
                     ]
                 };
