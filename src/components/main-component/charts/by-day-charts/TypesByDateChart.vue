@@ -123,6 +123,6 @@
 <style scoped>
     .types-by-dates {
         width: 100%;
-        height: 500px;
+        height: 380px;
     }
 </style>

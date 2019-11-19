@@ -7,7 +7,6 @@
 <script>
     import axios from 'axios'
     import IEcharts from 'vue-echarts-v3/src/full.js';
-    import date from 'date-and-time';
 
     export default {
         name: "NewUsers",
@@ -32,46 +31,17 @@
         },
         methods: {
             getDataFromServer() {
-                axios.get(`http://80.211.14.35/period/year`)
+                axios.get(`http://80.211.14.35/usersFirst/${this.period}`)
                     .then(response => this.getNewUsers(response.data))
                     .then(() => this.logLoaded = true)
             },
             getNewUsers(rawLog) {
-                rawLog.forEach(item => {
-                    if (!this.usersSignUp[item.user_id]) {
-                        this.usersSignUp[item.user_id] = item.time.split(' ')[0];
-                        // this.usersSignUp[item.user_id] = new Date(item.time);
-                    }
-                });
+                this.usersSignUp = rawLog;
 
                 this.getUniqChart();
                 this.periodChanged();
             },
             getUniqChart() {
-                let newUsersByDate = [];
-                for (let key in this.usersSignUp) {
-                    const uniqDate =  newUsersByDate.find(uniq => uniq.date === this.usersSignUp[key] );
-                    if (uniqDate) {
-                        uniqDate.count++;
-                    } else {
-                        newUsersByDate.push({
-                            date: this.usersSignUp[key],
-                            count: 1
-                        });
-                    }
-                }
-
-                if (this.period === 'month') {
-                    newUsersByDate = this.filterData(newUsersByDate, 30);
-                } else if (this.period === 'week') {
-                    newUsersByDate = this.filterData(newUsersByDate, 7);
-                }
-
-                newUsersByDate.sort((a, b) => {
-                    const aDate = Date.parse(`${a.date.split('.')[2]}-${a.date.split('.')[1]}-${a.date.split('.')[0]}`);
-                    const bDate = Date.parse(`${b.date.split('.')[2]}-${b.date.split('.')[1]}-${b.date.split('.')[0]}`);
-                    return aDate > bDate ? 1 : -1;
-                });
                 this.options = {
                     // color: ['#3398DB'],
                     tooltip : {
@@ -89,7 +59,7 @@
                     xAxis : [
                         {
                             type : 'category',
-                            data : newUsersByDate.map(item => item.date),
+                            data : this.usersSignUp.map(item => item.time),
                             axisTick: {
                                 alignWithLabel: true
                             }
@@ -105,16 +75,12 @@
                             name:'new users',
                             type:'bar',
                             barWidth: '60%',
-                            data: newUsersByDate.map(item => item.count)
+                            data: this.usersSignUp.map(item => item.count)
                         }
                     ]
                 };
 
                 this.logLoaded = true;
-            },
-            filterData(list, days) {
-                let now = date.addDays(new Date(), -days).getTime();
-                return list.filter(item => date.parse(item.date, 'YYYY-MM-DD').getTime() > now);
             },
             periodChanged() {
                 // const now = new Date();
@@ -134,6 +100,6 @@
 <style scoped>
     .new-users {
         width: 100%;
-        height: 500px;
+        height: 300px;
     }
 </style>

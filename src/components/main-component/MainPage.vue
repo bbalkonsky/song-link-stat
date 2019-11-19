@@ -10,17 +10,10 @@
             <div class="columns is-multiline">
                 <template v-if="logLoaded">
                     <div class="column is-half">
-                        <h4 class="title is-4">Average by week</h4>
-                        <average-by-week-chart
-                                :log="parsedLog" />
-                    </div>
-                </template>
-
-                <template v-if="logLoaded">
-                    <div class="column is-half">
                         <h4 class="title is-4">Unique users</h4>
                         <uniq-users-chart
                                 :log="parsedLog"
+                                :period="period"
                                 @on-chart-click="onChartClickHandler">
                         </uniq-users-chart>
                     </div>
@@ -36,7 +29,7 @@
                 </template>
 
                 <template v-if="logLoaded">
-                    <div class="column is-half">
+                    <div class="column is-full">
                         <h4 class="title is-4">
                             <section style="display: inline-block; height: 0;">
                                 <b-field>
@@ -55,13 +48,19 @@
                                                     native-value="types-by-date-chart">
                                         Types
                                     </b-radio-button>
+                                    <b-radio-button v-model="dayCountRadio"
+                                                    name="name"
+                                                    native-value="average-by-week-chart">
+                                        Week avg.
+                                    </b-radio-button>
                                 </b-field>
                             </section>
                         </h4>
 
                         <keep-alive>
-                            <component v-bind:is="dayCountRadio"
-                                  :log="this.parsedLog"
+                            <component :is="dayCountRadio"
+                                       :log="parsedLog"
+                                       :period="period"
                                   @on-chart-click="onChartClickHandler">
                             </component>
                         </keep-alive>
@@ -120,7 +119,7 @@
                             groupTitle: item.chat_title,
                             language: item.language,
                             date: parseDate,
-                            service: item.service == 'itunes' ? 'music.apple' : item.service,
+                            service: item.service === 'music.apple' ? 'appleMusic' : item.service === 'itunes' ? 'appleMusic' : item.service === 'music.youtube' ? 'youtubeMusic' : item.service,
                             query: item.query
                         }
                     );

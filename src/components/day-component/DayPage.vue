@@ -13,7 +13,13 @@
                     </div>
 
                     <div class="column is-full">
-                        <b-table :data="dayLog" :striped="true" :hoverable="true">
+                        <b-table :data="dayLog"
+                                 :striped="true"
+                                 :hoverable="true"
+                                 :paginated="isPaginated"
+                                 :per-page="perPage"
+                                 :current-page.sync="currentPage"
+                                 :pagination-position="paginationPosition">
                             <template slot-scope="props">
                                 <b-table-column field="id" label="ID" width="100" sortable>
                                     <b-button tag="router-link"
@@ -72,7 +78,11 @@
         },
         data: () => ({
             dayLog: [],
-            today: ''
+            today: '',
+            isPaginated: true,
+            paginationPosition: 'bottom',
+            currentPage: 1,
+            perPage: 7
         }),
         methods: {
             getFullData(rawArray) {

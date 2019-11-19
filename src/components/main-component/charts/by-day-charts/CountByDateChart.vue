@@ -13,7 +13,8 @@
             IEcharts
         },
         props: {
-            log: Array
+            log: Array,
+            period: String
         },
         watch: {
             log: function () {
@@ -43,24 +44,27 @@
                     }
                 });
 
-                this.trends = [];
-                this.byDate.forEach((item, idx) => {
-                    let trend = 0;
-                    if (idx > 6) {
-                        for (let i = idx - 6; i < idx; i++) {
-                            trend += this.byDate[i].count;
-                        }
-                        this.trends.push(Math.floor(trend / 7));
-                    } else if (idx === 0) {
-                        this.trends.push(Math.floor((this.byDate[0].count + this.byDate[1].count) / 2));
-                    } else {
-                        for (let i = 0; i < idx; i++) {
-                            trend += this.byDate[i].count;
-                        }
-                        this.trends.push(Math.floor(trend / (idx + 1)));
-                    }
-                });
+                if (['month', 'year'].includes(this.period)) {
+                    const period = this.period === 'month' ? 6 : 30;
+                    this.trends = [];
 
+                    this.byDate.forEach((item, idx) => {
+                        let trend = 0;
+                        if (idx > period) {
+                            for (let i = idx - period; i < idx; i++) {
+                                trend += this.byDate[i].count;
+                            }
+                            this.trends.push(Math.floor(trend / period));
+                        } else if (idx === 0) {
+                            this.trends.push(Math.floor((this.byDate[0].count + this.byDate[1].count) / 2));
+                        } else {
+                            for (let i = 0; i < idx; i++) {
+                                trend += this.byDate[i].count;
+                            }
+                            this.trends.push(Math.floor(trend / (idx + 1)));
+                        }
+                    });
+                }
 
                 this.options = {
                     // color: ['#262edb'],
@@ -94,7 +98,6 @@
                         {
                             name:'users',
                             type:'bar',
-                            barWidth: '60%',
                             data: this.byDate.map(item => item.count)
                         },
                         {
@@ -112,6 +115,6 @@
 <style scoped>
     .types-by-dates {
         width: 100%;
-        height: 500px;
+        height: 380px;
     }
 </style>

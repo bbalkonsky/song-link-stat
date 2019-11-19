@@ -12,7 +12,13 @@
             <user-dates-chart :dates="dates" :user-log="userLog" @on-chart-click="onChartClickHandler"/>
 
             <template v-if="userLog.length">
-                <b-table :data="userLog" :striped="true" :hoverable="true">
+                <b-table :data="userLog"
+                         :striped="true"
+                         :hoverable="true"
+                         :paginated="isPaginated"
+                         :per-page="perPage"
+                         :current-page.sync="currentPage"
+                         :pagination-position="paginationPosition">
                     <template slot-scope="props">
                         <b-table-column field="date" label="Date" sortable>
                             <b-button tag="router-link"
@@ -58,7 +64,11 @@
             dates: [],
             chartsData: [],
             options: {},
-            isChartReadyToShow: false
+            isChartReadyToShow: false,
+            isPaginated: true,
+            paginationPosition: 'bottom',
+            currentPage: 1,
+            perPage: 7
         }),
         methods: {
             getFullData(rawArray) {

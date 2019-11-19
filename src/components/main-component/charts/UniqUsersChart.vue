@@ -13,7 +13,8 @@
             IEcharts
         },
         props: {
-            log: Array
+            log: Array,
+            period: String
         },
         watch: {
             log: function () {
@@ -21,8 +22,8 @@
             }
         },
         data: () => ({
-            options: {},
             uniqUsersByDate: [],
+            options: {},
             trends: []
         }),
         mounted() {
@@ -47,23 +48,27 @@
                     }
                 });
 
-                this.trends = [];
-                this.uniqUsersByDate.forEach((item, idx) => {
-                    let trend = 0;
-                    if (idx > 6) {
-                        for (let i = idx - 6; i < idx; i++) {
-                            trend += this.uniqUsersByDate[i].count;
+                if (['month', 'year'].includes(this.period)) {
+                    const period = this.period === 'month' ? 6 : 30;
+                    this.trends = [];
+
+                    this.uniqUsersByDate.forEach((item, idx) => {
+                        let trend = 0;
+                        if (idx > period) {
+                            for (let i = idx - period; i < idx; i++) {
+                                trend += this.uniqUsersByDate[i].count;
+                            }
+                            this.trends.push(Math.floor(trend / period));
+                        } else if (idx === 0) {
+                            this.trends.push(Math.floor((this.uniqUsersByDate[0].count + this.uniqUsersByDate[1].count) / 2));
+                        } else {
+                            for (let i = 0; i < idx; i++) {
+                                trend += this.uniqUsersByDate[i].count;
+                            }
+                            this.trends.push(Math.floor(trend / (idx + 1)));
                         }
-                        this.trends.push(Math.floor(trend / 7));
-                    } else if (idx === 0) {
-                        this.trends.push(Math.floor((this.uniqUsersByDate[0].count + this.uniqUsersByDate[1].count) / 2));
-                    } else {
-                        for (let i = 0; i < idx; i++) {
-                            trend += this.uniqUsersByDate[i].count;
-                        }
-                        this.trends.push(Math.floor(trend / (idx + 1)));
-                    }
-                });
+                    });
+                }
 
                 this.options = {
                     // color: ['#3398DB'],
@@ -122,6 +127,6 @@
 <style scoped>
     .uniq {
         width: 100%;
-        height: 500px;
+        height: 300px;
     }
 </style>

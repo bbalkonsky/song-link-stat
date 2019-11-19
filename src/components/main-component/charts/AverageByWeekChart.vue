@@ -36,7 +36,7 @@
                 this.periods = [];
 
                 this.log.forEach(logItem => {
-                    const date = this.datesCount.find(item => item.date == logItem.date);
+                    const date = this.datesCount.find(item => item.date === logItem.date);
                     if (date) {
                         date.count++;
                     } else {
@@ -119,6 +119,6 @@
 <style scoped>
     .average-by-week-chart {
         width: 100%;
-        height: 500px;
+        height: 380px;
     }
 </style>
