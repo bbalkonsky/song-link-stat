@@ -30,7 +30,7 @@
                         <div class="navbar-end">
                             <span class="navbar-item">
                                 <b-dropdown aria-role="list" @change="periodSelectHandler($event)">
-                                    <button class="button is-dark" slot="trigger">
+                                    <button class="button is-dark is-medium" slot="trigger">
                                         <span>{{period}}</span>
 <!--                                        <b-icon icon="menu-down"></b-icon>-->
                                     </button>
@@ -59,7 +59,7 @@
                     'is-success': false,
                     'is-warning': false,
                     'is-danger': false,
-                    'is-light': false,
+                    // 'is-light': false,
                     'is-dark': false
                 },
                 period: 'Month'
@@ -69,6 +69,9 @@
             color: function () {
                 const colorsLength = Object.keys(this.colors).length - 1;
                 const newColor = Object.keys(this.colors)[[this.getRndInteger(0, colorsLength)]];
+
+                this.$emit('header-color', newColor);
+
                 return {
                     [newColor]: true
                 }

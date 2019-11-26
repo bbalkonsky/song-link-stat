@@ -14,7 +14,8 @@
         },
         props: {
             log: Array,
-            period: String
+            period: String,
+            chartsColor: String
         },
         watch: {
             log: function () {
@@ -82,7 +83,7 @@
                 }
 
                 this.options = {
-                    // color: ['#262edb'],
+                    color: [this.chartsColor, '#555555'],
                     tooltip : {
                         trigger: 'axis',
                         axisPointer : {

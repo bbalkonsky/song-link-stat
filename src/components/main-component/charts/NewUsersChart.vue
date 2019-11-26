@@ -14,7 +14,8 @@
             IEcharts
         },
         props: {
-            period: String
+            period: String,
+            chartsColor: String
         },
         watch: {
             period: () => {
@@ -43,7 +44,7 @@
             },
             getUniqChart() {
                 this.options = {
-                    // color: ['#3398DB'],
+                    color: [this.chartsColor, '#555555'],
                     tooltip : {
                         trigger: 'axis',
                         axisPointer : {

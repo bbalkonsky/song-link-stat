@@ -1,6 +1,6 @@
 <template>
     <div class="main-page">
-        <header-hero @period-changed="dropdownClickHandler" />
+        <header-hero @period-changed="dropdownClickHandler" @header-color="headerColorHandler($event)"/>
 
         <error-page v-if="false">
 
@@ -14,6 +14,7 @@
                         <uniq-users-chart
                                 :log="parsedLog"
                                 :period="period"
+                                :chartsColor="chartsColor"
                                 @on-chart-click="onChartClickHandler">
                         </uniq-users-chart>
                     </div>
@@ -23,6 +24,7 @@
                         <h4 class="title is-4">New users</h4>
                         <new-users-chart
                                 :period="period"
+                                :chartsColor="chartsColor"
                                 @on-chart-click="onChartClickHandler">
                         </new-users-chart>
                     </div>
@@ -33,22 +35,26 @@
                         <h4 class="title is-4">
                             <section style="display: inline-block; height: 0;">
                                 <b-field>
-                                    <b-radio-button v-model="dayCountRadio"
+                                    <b-radio-button :type=headerColorType
+                                                    v-model="dayCountRadio"
                                                     name="name"
                                                     native-value="count-by-date-chart">
                                         Summ
                                     </b-radio-button>
-                                    <b-radio-button v-model="dayCountRadio"
+                                    <b-radio-button :type=headerColorType
+                                                    v-model="dayCountRadio"
                                                     name="name"
                                                     native-value="services-by-date-chart">
                                         Services
                                     </b-radio-button>
-                                    <b-radio-button v-model="dayCountRadio"
+                                    <b-radio-button :type=headerColorType
+                                                    v-model="dayCountRadio"
                                                     name="name"
                                                     native-value="types-by-date-chart">
                                         Types
                                     </b-radio-button>
-                                    <b-radio-button v-model="dayCountRadio"
+                                    <b-radio-button :type=headerColorType
+                                                    v-model="dayCountRadio"
                                                     name="name"
                                                     native-value="average-by-week-chart">
                                         Week avg.
@@ -61,6 +67,7 @@
                             <component :is="dayCountRadio"
                                        :log="parsedLog"
                                        :period="period"
+                                       :chartsColor="chartsColor"
                                   @on-chart-click="onChartClickHandler">
                             </component>
                         </keep-alive>
@@ -102,7 +109,16 @@
             newUsersLoadReady: false,
             logLoaded: false,
             dayCountRadio: 'count-by-date-chart',
-            period: 'month'
+            period: 'month',
+            headerColorType: 'is-info',
+            chartsColor: '#3298dc',
+            headerColors: {
+                'is-info': '#0386d3',
+                'is-success': '#48c774',
+                'is-warning': '#ffb227',
+                'is-danger': '#ff0761',
+                'is-dark': '#363636'
+            }
         }),
         methods: {
             getFullData(rawLog) {
@@ -138,6 +154,10 @@
                 axios.get(`http://80.211.14.35/period/${period}`)
                     .then(response => this.getFullData(response.data))
                     .then(() => this.logLoaded = true)
+            },
+            headerColorHandler(color) {
+                this.chartsColor = this.headerColors[color];
+                this.headerColorType = color;
             }
         },
         created() {
