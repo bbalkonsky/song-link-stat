@@ -29,10 +29,10 @@
                     <div v-else class="navbar-menu">
                         <div class="navbar-end">
                             <span class="navbar-item">
-                                <b-dropdown aria-role="list" @change="$emit('period-changed', $event)">
+                                <b-dropdown aria-role="list" @change="periodSelectHandler($event)">
                                     <button class="button is-dark" slot="trigger">
-                                        <span>Change period</span>
-                                        <b-icon icon="menu-down"></b-icon>
+                                        <span>{{period}}</span>
+<!--                                        <b-icon icon="menu-down"></b-icon>-->
                                     </button>
 
                                     <b-dropdown-item aria-role="listitem" value="month">Month</b-dropdown-item>
@@ -61,7 +61,8 @@
                     'is-danger': false,
                     'is-light': false,
                     'is-dark': false
-                }
+                },
+                period: 'Month'
             }
         },
         computed: {
@@ -82,6 +83,10 @@
             getRndInteger(min, max) {
                 return Math.floor(Math.random() * (max - min + 1) ) + min;
             },
+            periodSelectHandler(period) {
+                this.$emit('period-changed', period);
+                this.period = period.charAt(0).toUpperCase() + period.slice(1);
+            }
         }
     }
 </script>
