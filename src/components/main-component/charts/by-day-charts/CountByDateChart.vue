@@ -24,7 +24,17 @@
         data: () => ({
             byDate: [],
             options: {},
-            trends: []
+            trends: [],
+            coefficients:
+                {
+                    0: 0.432,
+                    1: 0.737,
+                    2: 0.752,
+                    3: 0.927,
+                    4: 0.834,
+                    5: 0.999,
+                    6: 0.458,
+                }
         }),
         mounted() {
             this.getTypesChart();
@@ -44,6 +54,11 @@
                     }
                 });
 
+                // here, the moving average is applied, multiplied by the average rate of contribution of the day of the week to the total number of users
+                this.byDate.forEach(item => {
+                    item.countByCoefficient = item.count * this.coefficients[new Date(`${item.date}`).getDay()];
+                });
+
                 if (['month', 'year'].includes(this.period)) {
                     const period = this.period === 'month' ? 6 : 30;
                     this.trends = [];
@@ -52,14 +67,14 @@
                         let trend = 0;
                         if (idx > period) {
                             for (let i = idx - period; i < idx; i++) {
-                                trend += this.byDate[i].count;
+                                trend += this.byDate[i].countByCoefficient;
                             }
                             this.trends.push(Math.floor(trend / period));
                         } else if (idx === 0) {
-                            this.trends.push(Math.floor((this.byDate[0].count + this.byDate[1].count) / 2));
+                            this.trends.push(Math.floor((this.byDate[0].countByCoefficient + this.byDate[1].countByCoefficient) / 2));
                         } else {
                             for (let i = 0; i < idx; i++) {
-                                trend += this.byDate[i].count;
+                                trend += this.byDate[i].countByCoefficient;
                             }
                             this.trends.push(Math.floor(trend / (idx + 1)));
                         }
